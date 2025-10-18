@@ -245,9 +245,59 @@ def run():
     print(json.dumps({"tabs":tabs,"snapshot":wal},indent=2))
 
 if __name__=="__main__": run()
-{
+{202
   "$id": "national_letters.v1",
   "letter_id": "natlet-20251018-sapdT25010706",
   "recipient_entity": "White House / DOJ",
   "subject": "Government Shutdown Impacts — Auto-Pay Obstruction and SAPD Theft/Fraud Cases",
-  "summary": "Escalation of SAPD theft case T25010706 and related cases (2023-1687368, 2023-1448879, 2025-1998568, 2025-0998069, 2025-1027164, 2025-1400245). Auto-pay obstructions linked to Midland Mortgage (MidFirst Bank), Wells Fargo, and Allstate Insurance threaten compliance with FHA/Commercial loan agreements and surety bond/judge guidelines (Laurel Ridge 202
+  "summary": "Escalation of SAPD theft case T25010706 and related cases (2023-1687368, 2023-1448879, 2025-1998568, 2025-0998069, 2025-1027164, 2025-1400245). Auto-pay obstructions linked to Midland Mortgage (MidFirst Bank), Wells Fargo, and Allstate Insurance threaten compliance with FHA/Commercial loan agreements and surety bond/judge guidelines (Laurel Ridge 
+WhistleblowerProtection_AMLA:
+  - field: WhistleblowerReport
+    source: Employee, Contractor, Auditor
+    enforce: ProtectionAgainstRetaliation == True
+    violation: Retaliation
+    escalation: HighRisk
+    statutory_anchor: 31_U.S.C_§5323(g)
+
+  - field: Confidentiality
+    enforce: IdentityDisclosure == False
+    violation: BreachOfConfidentiality
+    escalation: HighRisk
+
+  - field: Enforcement
+    options: [DOL_Complaint, DistrictCourtAction]
+    relief: [Reinstatement, DoubleBackPay, CompensatoryDamages]
+    audit:
+      hash: True
+      timestamp: True
+      anchor: "AMLA Whistleblower Statute"
+
+RiskDashboard:
+  AMLACompliance:
+    - trigger: RetaliationAgainstWhistleblower
+      escalation: HighRisk
+    - trigger: BreachOfConfidentiality
+      escalation: HighRisk
+    - trigger: FailureToProvideRelief
+      escalation: CriticalRisk
+RepositoryEvidence:
+  - repo_id: "gh:4conersneverchange-create/Hoa-plus-homeowners-12-30-years"
+    url: "https://github.com/4conersneverchange-create/Hoa-plus-homeowners-12-30-years"
+    scope: ["HOA", "Homeowners", "SAPD theft"]
+    chain_of_custody:
+      hash_manifest: True
+      signed_snapshot: True
+      merkle_root: True
+    file_manifests:
+      - path: "SAPD theft/"
+        label: "SAPD theft evidence set"
+        anchors: ["T25010706", "2023-1448879", "2023-1687368", "2025-1400245"]
+      - path: "Documentation/"
+        label: "Statutory references and SOPs"
+        anchors: ["TX Penal Code", "Property Code", "Insurance Code", "Occ. Code"]
+    cross_refs:
+      tabs: ["BankEntities", "NationalLetters", "ChildSupportLedger", "CourtAnchors", "IdentityVerification"]
+    audit:
+      hash: True
+      timestamp: True
+      vault_pointer: "vault://gh/Hoa-plus-homeowners-12-30-years.snapshot"
