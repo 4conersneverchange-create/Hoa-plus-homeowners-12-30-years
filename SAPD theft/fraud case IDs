@@ -167,3 +167,87 @@ df.to_excel("unified_case_dossier.xlsx", index=False)
 df_expanded.to_csv("unified_case_links.csv", index=False)
 
 print("Unified case dossier exported successfully.")
+import hashlib, json
+from datetime import datetime, timezone
+
+def sha256_hex(s): return hashlib.sha256(s.encode()).hexdigest()
+
+def common_fragment(source):
+    return {
+        "doc_hash": sha256_hex(source + str(datetime.now().timestamp())),
+        "ingest_time_utc": datetime.now(timezone.utc).isoformat(),
+        "source": source,
+        "provenance_id": f"prov-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    }
+
+# --- Bank Entities ---
+def build_bank_entity(name, role, accounts_masked, poa_status, auto_pay_status, statutes):
+    return {
+        "entity_id": sha256_hex(name),
+        "entity_name": name,
+        "entity_role": role,
+        "accounts_masked": accounts_masked,
+        "vault_pointer": f"vault://{name.lower().replace(' ', '-')}.enc",
+        "poa_status": poa_status,
+        "auto_pay_status": auto_pay_status,
+        "statute_refs": statutes,
+        "common": common_fragment(f"bank_entity:{name}")
+    }
+
+# --- National Letter ---
+def build_national_letter(subject, summary, statutes, attachments):
+    return {
+        "letter_id": sha256_hex(subject),
+        "recipient_entity": "White House / DOJ",
+        "subject": subject,
+        "summary": summary,
+        "attachments": attachments,
+        "requested_action": "Federal review and fraud investigation",
+        "delivery_method": "WebForm",
+        "statute_refs": statutes,
+        "common": common_fragment("national_letter")
+    }
+
+# --- Validators ---
+def validate_bank_entity(entity):
+    if entity["poa_status"] in ["Suspected","Revoked"] and entity["auto_pay_status"]=="Enabled":
+        raise ValueError("AutoPayRisk: POA suspected/revoked but auto-pay still enabled")
+    return True
+
+def validate_letter(letter):
+    if not letter["statute_refs"]:
+        raise ValueError("Letter missing statute anchors")
+    return True
+
+# --- Chain-of-custody snapshot ---
+def snapshot(tabs):
+    tab_hashes = {k: sha256_hex(json.dumps(v, sort_keys=True)) for k,v in tabs.items()}
+    root = sha256_hex("".join(tab_hashes.values()))
+    return {"tab_hashes": tab_hashes, "merkle_root": root, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+def run():
+    wells = build_bank_entity("Wells Fargo Bank NA","Mortgagee",["****4321"],"Suspected","Suspended",["usc.18.1344"])
+    midland = build_bank_entity("Midland Mortgage/MidFirst","Servicer",["****9987"],"None","Enabled",["usc.18.1344"])
+    allstate = build_bank_entity("Allstate Insurance","Lienholder",[],"None","Enabled",["texas.insurance.code"])
+
+    for e in [wells,midland,allstate]: validate_bank_entity(e)
+
+    letter = build_national_letter(
+        "Illegal POA and Auto-Pay Fraud — SAPD Case T25010706",
+        "Escalation of SAPD theft case T25010706 with related cases 2023-1448879, 2023-1687368, 2025-1400245.",
+        ["texas.penal.37.11","texas.penal.31","usc.18.1344","usc.18.1956","usc.18.1957"],
+        ["vault://sapd-report-T25010706.pdf","vault://allstate-declarations.pdf"]
+    )
+    validate_letter(letter)
+
+    tabs = {"bank_entities":[wells,midland,allstate],"national_letters":[letter]}
+    wal = snapshot(tabs)
+    print(json.dumps({"tabs":tabs,"snapshot":wal},indent=2))
+
+if __name__=="__main__": run()
+{
+  "$id": "national_letters.v1",
+  "letter_id": "natlet-20251018-sapdT25010706",
+  "recipient_entity": "White House / DOJ",
+  "subject": "Government Shutdown Impacts — Auto-Pay Obstruction and SAPD Theft/Fraud Cases",
+  "summary": "Escalation of SAPD theft case T25010706 and related cases (2023-1687368, 2023-1448879, 2025-1998568, 2025-0998069, 2025-1027164, 2025-1400245). Auto-pay obstructions linked to Midland Mortgage (MidFirst Bank), Wells Fargo, and Allstate Insurance threaten compliance with FHA/Commercial loan agreements and surety bond/judge guidelines (Laurel Ridge 202
