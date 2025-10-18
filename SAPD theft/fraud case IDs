@@ -1,0 +1,169 @@
+import pandas as pd
+
+# Define toxicology references
+toxicology_data = [
+    {
+        "Case Ref": "791014",
+        "Institution": "University Hospital",
+        "Date": "2018-12-31",
+        "SID/Docket": "SID 791014",
+        "Notes": "Officer body cams",
+        "Statutory Anchor": "FDA Poison Control (21 U.S.C. § 351)"
+    },
+    {
+        "Case Ref": "2023-1687368",
+        "Institution": "Methodist Hospital",
+        "Date": "2020-06-19",
+        "SID/Docket": None,
+        "Notes": "False ED; Pick-n-Pull dispatch logs (210-632-3400 / 210-632-3200)",
+        "Statutory Anchor": "Controlled Substances Act (21 U.S.C. § 801); TX HSC Ch. 481"
+    },
+    {
+        "Case Ref": "2023MH02979",
+        "Institution": "Laurel Ridge Mental Health Court",
+        "Date": "2023",
+        "SID/Docket": "Docket 02979",
+        "Notes": "Caller arrest; False ED",
+        "Statutory Anchor": "Texas Mental Health Code"
+    }
+]
+
+# Convert to DataFrame
+df = pd.DataFrame(toxicology_data)
+
+# Export to Excel/CSV
+df.to_excel("toxicology_reports.xlsx", index=False)
+df.to_csv("toxicology_reports.csv", index=False)
+
+print("Toxicology reports exported successfully.")
+import pandas as pd
+
+# Define toxicology references with cross-links to SAPD cases
+toxicology_data = [
+    {
+        "Case Ref": "791014",
+        "Institution": "University Hospital",
+        "Date": "2018-12-31",
+        "SID/Docket": "SID 791014",
+        "Notes": "Officer body cams",
+        "Statutory Anchor": "FDA Poison Control (21 U.S.C. § 351)",
+        "Linked SAPD Cases": ["T25010706", "2023-1448879"]
+    },
+    {
+        "Case Ref": "2023-1687368",
+        "Institution": "Methodist Hospital",
+        "Date": "2020-06-19",
+        "SID/Docket": None,
+        "Notes": "False ED; Pick-n-Pull dispatch logs (210-632-3400 / 210-632-3200)",
+        "Statutory Anchor": "Controlled Substances Act (21 U.S.C. § 801); TX HSC Ch. 481",
+        "Linked SAPD Cases": ["2023-1687368", "2025-1027164"]
+    },
+    {
+        "Case Ref": "2023MH02979",
+        "Institution": "Laurel Ridge Mental Health Court",
+        "Date": "2023",
+        "SID/Docket": "Docket 02979",
+        "Notes": "Caller arrest; False ED",
+        "Statutory Anchor": "Texas Mental Health Code",
+        "Linked SAPD Cases": ["T25010706"]
+    }
+]
+
+# Convert to DataFrame
+df = pd.DataFrame(toxicology_data)
+
+# Expand Linked SAPD Cases into a normalized table for pivoting
+df_expanded = df.explode("Linked SAPD Cases")
+
+# Export to Excel/CSV
+df.to_excel("toxicology_reports_master.xlsx", index=False)
+df.to_csv("toxicology_reports_master.csv", index=False)
+
+df_expanded.to_excel("toxicology_case_links.xlsx", index=False)
+df_expanded.to_csv("toxicology_case_links.csv", index=False)
+
+print("Toxicology reports with SAPD case links exported successfully.")
+import pandas as pd
+
+# Unified dataset
+cases = [
+    {
+        "Primary ID": "791014",
+        "Case Type": "Toxicology",
+        "Institution / Source": "University Hospital",
+        "Date": "2018-12-31",
+        "SID/Docket": "SID 791014",
+        "Linked SAPD Case(s)": ["T25010706", "2023-1448879"],
+        "Statutory Anchor(s)": "FDA Poison Control (21 U.S.C. § 351)",
+        "Notes / Provenance": "Officer body cams"
+    },
+    {
+        "Primary ID": "2023-1687368",
+        "Case Type": "Toxicology",
+        "Institution / Source": "Methodist Hospital",
+        "Date": "2020-06-19",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2023-1687368", "2025-1027164"],
+        "Statutory Anchor(s)": "CSA (21 U.S.C. § 801); TX HSC Ch. 481",
+        "Notes / Provenance": "False ED; Pick-n-Pull dispatch logs"
+    },
+    {
+        "Primary ID": "2023MH02979",
+        "Case Type": "Toxicology",
+        "Institution / Source": "Laurel Ridge Mental Health Court",
+        "Date": "2023",
+        "SID/Docket": "Docket 02979",
+        "Linked SAPD Case(s)": ["T25010706"],
+        "Statutory Anchor(s)": "Texas Mental Health Code",
+        "Notes / Provenance": "Caller arrest; False ED"
+    },
+    {
+        "Primary ID": "HOA-2025-001",
+        "Case Type": "Fraud (HOA)",
+        "Institution / Source": "County Clerk / HOA Board",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["T25010706"],
+        "Statutory Anchor(s)": "TX Property Code Ch. 209",
+        "Notes / Provenance": "Lien fraud allegation"
+    },
+    {
+        "Primary ID": "HOA-2025-002",
+        "Case Type": "Fraud (Loan)",
+        "Institution / Source": "Realtor Office",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2023-1687368"],
+        "Statutory Anchor(s)": "TX Penal Code §32.32",
+        "Notes / Provenance": "Commercial loan misrepresentation"
+    },
+    {
+        "Primary ID": "HOA-2025-003",
+        "Case Type": "Fraud (Insurance)",
+        "Institution / Source": "Insurance Agent",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2023-1448879"],
+        "Statutory Anchor(s)": "TX Insurance Code Ch. 541",
+        "Notes / Provenance": "False claim filing"
+    },
+    {
+        "Primary ID": "HOA-2025-004",
+        "Case Type": "Fraud (Bond)",
+        "Institution / Source": "Surety Company",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2025-1027164"],
+        "Statutory Anchor(s)": "TX Occ. Code §1101",
+        "Notes / Provenance": "Affidavit auto-gen required"
+    }
+]
+
+df = pd.DataFrame(cases)
+df_expanded = df.explode("Linked SAPD Case(s)")
+
+# Export
+df.to_excel("unified_case_dossier.xlsx", index=False)
+df_expanded.to_csv("unified_case_links.csv", index=False)
+
+print("Unified case dossier exported successfully.")
