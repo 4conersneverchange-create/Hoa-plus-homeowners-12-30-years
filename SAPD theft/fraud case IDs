@@ -1,0 +1,303 @@
+import pandas as pd
+
+# Define toxicology references
+toxicology_data = [
+    {
+        "Case Ref": "791014",
+        "Institution": "University Hospital",
+        "Date": "2018-12-31",
+        "SID/Docket": "SID 791014",
+        "Notes": "Officer body cams",
+        "Statutory Anchor": "FDA Poison Control (21 U.S.C. § 351)"
+    },
+    {
+        "Case Ref": "2023-1687368",
+        "Institution": "Methodist Hospital",
+        "Date": "2020-06-19",
+        "SID/Docket": None,
+        "Notes": "False ED; Pick-n-Pull dispatch logs (210-632-3400 / 210-632-3200)",
+        "Statutory Anchor": "Controlled Substances Act (21 U.S.C. § 801); TX HSC Ch. 481"
+    },
+    {
+        "Case Ref": "2023MH02979",
+        "Institution": "Laurel Ridge Mental Health Court",
+        "Date": "2023",
+        "SID/Docket": "Docket 02979",
+        "Notes": "Caller arrest; False ED",
+        "Statutory Anchor": "Texas Mental Health Code"
+    }
+]
+
+# Convert to DataFrame
+df = pd.DataFrame(toxicology_data)
+
+# Export to Excel/CSV
+df.to_excel("toxicology_reports.xlsx", index=False)
+df.to_csv("toxicology_reports.csv", index=False)
+
+print("Toxicology reports exported successfully.")
+import pandas as pd
+
+# Define toxicology references with cross-links to SAPD cases
+toxicology_data = [
+    {
+        "Case Ref": "791014",
+        "Institution": "University Hospital",
+        "Date": "2018-12-31",
+        "SID/Docket": "SID 791014",
+        "Notes": "Officer body cams",
+        "Statutory Anchor": "FDA Poison Control (21 U.S.C. § 351)",
+        "Linked SAPD Cases": ["T25010706", "2023-1448879"]
+    },
+    {
+        "Case Ref": "2023-1687368",
+        "Institution": "Methodist Hospital",
+        "Date": "2020-06-19",
+        "SID/Docket": None,
+        "Notes": "False ED; Pick-n-Pull dispatch logs (210-632-3400 / 210-632-3200)",
+        "Statutory Anchor": "Controlled Substances Act (21 U.S.C. § 801); TX HSC Ch. 481",
+        "Linked SAPD Cases": ["2023-1687368", "2025-1027164"]
+    },
+    {
+        "Case Ref": "2023MH02979",
+        "Institution": "Laurel Ridge Mental Health Court",
+        "Date": "2023",
+        "SID/Docket": "Docket 02979",
+        "Notes": "Caller arrest; False ED",
+        "Statutory Anchor": "Texas Mental Health Code",
+        "Linked SAPD Cases": ["T25010706"]
+    }
+]
+
+# Convert to DataFrame
+df = pd.DataFrame(toxicology_data)
+
+# Expand Linked SAPD Cases into a normalized table for pivoting
+df_expanded = df.explode("Linked SAPD Cases")
+
+# Export to Excel/CSV
+df.to_excel("toxicology_reports_master.xlsx", index=False)
+df.to_csv("toxicology_reports_master.csv", index=False)
+
+df_expanded.to_excel("toxicology_case_links.xlsx", index=False)
+df_expanded.to_csv("toxicology_case_links.csv", index=False)
+
+print("Toxicology reports with SAPD case links exported successfully.")
+import pandas as pd
+
+# Unified dataset
+cases = [
+    {
+        "Primary ID": "791014",
+        "Case Type": "Toxicology",
+        "Institution / Source": "University Hospital",
+        "Date": "2018-12-31",
+        "SID/Docket": "SID 791014",
+        "Linked SAPD Case(s)": ["T25010706", "2023-1448879"],
+        "Statutory Anchor(s)": "FDA Poison Control (21 U.S.C. § 351)",
+        "Notes / Provenance": "Officer body cams"
+    },
+    {
+        "Primary ID": "2023-1687368",
+        "Case Type": "Toxicology",
+        "Institution / Source": "Methodist Hospital",
+        "Date": "2020-06-19",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2023-1687368", "2025-1027164"],
+        "Statutory Anchor(s)": "CSA (21 U.S.C. § 801); TX HSC Ch. 481",
+        "Notes / Provenance": "False ED; Pick-n-Pull dispatch logs"
+    },
+    {
+        "Primary ID": "2023MH02979",
+        "Case Type": "Toxicology",
+        "Institution / Source": "Laurel Ridge Mental Health Court",
+        "Date": "2023",
+        "SID/Docket": "Docket 02979",
+        "Linked SAPD Case(s)": ["T25010706"],
+        "Statutory Anchor(s)": "Texas Mental Health Code",
+        "Notes / Provenance": "Caller arrest; False ED"
+    },
+    {
+        "Primary ID": "HOA-2025-001",
+        "Case Type": "Fraud (HOA)",
+        "Institution / Source": "County Clerk / HOA Board",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["T25010706"],
+        "Statutory Anchor(s)": "TX Property Code Ch. 209",
+        "Notes / Provenance": "Lien fraud allegation"
+    },
+    {
+        "Primary ID": "HOA-2025-002",
+        "Case Type": "Fraud (Loan)",
+        "Institution / Source": "Realtor Office",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2023-1687368"],
+        "Statutory Anchor(s)": "TX Penal Code §32.32",
+        "Notes / Provenance": "Commercial loan misrepresentation"
+    },
+    {
+        "Primary ID": "HOA-2025-003",
+        "Case Type": "Fraud (Insurance)",
+        "Institution / Source": "Insurance Agent",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2023-1448879"],
+        "Statutory Anchor(s)": "TX Insurance Code Ch. 541",
+        "Notes / Provenance": "False claim filing"
+    },
+    {
+        "Primary ID": "HOA-2025-004",
+        "Case Type": "Fraud (Bond)",
+        "Institution / Source": "Surety Company",
+        "Date": "2025",
+        "SID/Docket": None,
+        "Linked SAPD Case(s)": ["2025-1027164"],
+        "Statutory Anchor(s)": "TX Occ. Code §1101",
+        "Notes / Provenance": "Affidavit auto-gen required"
+    }
+]
+
+df = pd.DataFrame(cases)
+df_expanded = df.explode("Linked SAPD Case(s)")
+
+# Export
+df.to_excel("unified_case_dossier.xlsx", index=False)
+df_expanded.to_csv("unified_case_links.csv", index=False)
+
+print("Unified case dossier exported successfully.")
+import hashlib, json
+from datetime import datetime, timezone
+
+def sha256_hex(s): return hashlib.sha256(s.encode()).hexdigest()
+
+def common_fragment(source):
+    return {
+        "doc_hash": sha256_hex(source + str(datetime.now().timestamp())),
+        "ingest_time_utc": datetime.now(timezone.utc).isoformat(),
+        "source": source,
+        "provenance_id": f"prov-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    }
+
+# --- Bank Entities ---
+def build_bank_entity(name, role, accounts_masked, poa_status, auto_pay_status, statutes):
+    return {
+        "entity_id": sha256_hex(name),
+        "entity_name": name,
+        "entity_role": role,
+        "accounts_masked": accounts_masked,
+        "vault_pointer": f"vault://{name.lower().replace(' ', '-')}.enc",
+        "poa_status": poa_status,
+        "auto_pay_status": auto_pay_status,
+        "statute_refs": statutes,
+        "common": common_fragment(f"bank_entity:{name}")
+    }
+
+# --- National Letter ---
+def build_national_letter(subject, summary, statutes, attachments):
+    return {
+        "letter_id": sha256_hex(subject),
+        "recipient_entity": "White House / DOJ",
+        "subject": subject,
+        "summary": summary,
+        "attachments": attachments,
+        "requested_action": "Federal review and fraud investigation",
+        "delivery_method": "WebForm",
+        "statute_refs": statutes,
+        "common": common_fragment("national_letter")
+    }
+
+# --- Validators ---
+def validate_bank_entity(entity):
+    if entity["poa_status"] in ["Suspected","Revoked"] and entity["auto_pay_status"]=="Enabled":
+        raise ValueError("AutoPayRisk: POA suspected/revoked but auto-pay still enabled")
+    return True
+
+def validate_letter(letter):
+    if not letter["statute_refs"]:
+        raise ValueError("Letter missing statute anchors")
+    return True
+
+# --- Chain-of-custody snapshot ---
+def snapshot(tabs):
+    tab_hashes = {k: sha256_hex(json.dumps(v, sort_keys=True)) for k,v in tabs.items()}
+    root = sha256_hex("".join(tab_hashes.values()))
+    return {"tab_hashes": tab_hashes, "merkle_root": root, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+def run():
+    wells = build_bank_entity("Wells Fargo Bank NA","Mortgagee",["****4321"],"Suspected","Suspended",["usc.18.1344"])
+    midland = build_bank_entity("Midland Mortgage/MidFirst","Servicer",["****9987"],"None","Enabled",["usc.18.1344"])
+    allstate = build_bank_entity("Allstate Insurance","Lienholder",[],"None","Enabled",["texas.insurance.code"])
+
+    for e in [wells,midland,allstate]: validate_bank_entity(e)
+
+    letter = build_national_letter(
+        "Illegal POA and Auto-Pay Fraud — SAPD Case T25010706",
+        "Escalation of SAPD theft case T25010706 with related cases 2023-1448879, 2023-1687368, 2025-1400245.",
+        ["texas.penal.37.11","texas.penal.31","usc.18.1344","usc.18.1956","usc.18.1957"],
+        ["vault://sapd-report-T25010706.pdf","vault://allstate-declarations.pdf"]
+    )
+    validate_letter(letter)
+
+    tabs = {"bank_entities":[wells,midland,allstate],"national_letters":[letter]}
+    wal = snapshot(tabs)
+    print(json.dumps({"tabs":tabs,"snapshot":wal},indent=2))
+
+if __name__=="__main__": run()
+{202
+  "$id": "national_letters.v1",
+  "letter_id": "natlet-20251018-sapdT25010706",
+  "recipient_entity": "White House / DOJ",
+  "subject": "Government Shutdown Impacts — Auto-Pay Obstruction and SAPD Theft/Fraud Cases",
+  "summary": "Escalation of SAPD theft case T25010706 and related cases (2023-1687368, 2023-1448879, 2025-1998568, 2025-0998069, 2025-1027164, 2025-1400245). Auto-pay obstructions linked to Midland Mortgage (MidFirst Bank), Wells Fargo, and Allstate Insurance threaten compliance with FHA/Commercial loan agreements and surety bond/judge guidelines (Laurel Ridge 
+WhistleblowerProtection_AMLA:
+  - field: WhistleblowerReport
+    source: Employee, Contractor, Auditor
+    enforce: ProtectionAgainstRetaliation == True
+    violation: Retaliation
+    escalation: HighRisk
+    statutory_anchor: 31_U.S.C_§5323(g)
+
+  - field: Confidentiality
+    enforce: IdentityDisclosure == False
+    violation: BreachOfConfidentiality
+    escalation: HighRisk
+
+  - field: Enforcement
+    options: [DOL_Complaint, DistrictCourtAction]
+    relief: [Reinstatement, DoubleBackPay, CompensatoryDamages]
+    audit:
+      hash: True
+      timestamp: True
+      anchor: "AMLA Whistleblower Statute"
+
+RiskDashboard:
+  AMLACompliance:
+    - trigger: RetaliationAgainstWhistleblower
+      escalation: HighRisk
+    - trigger: BreachOfConfidentiality
+      escalation: HighRisk
+    - trigger: FailureToProvideRelief
+      escalation: CriticalRisk
+RepositoryEvidence:
+  - repo_id: "gh:4conersneverchange-create/Hoa-plus-homeowners-12-30-years"
+    url: "https://github.com/4conersneverchange-create/Hoa-plus-homeowners-12-30-years"
+    scope: ["HOA", "Homeowners", "SAPD theft"]
+    chain_of_custody:
+      hash_manifest: True
+      signed_snapshot: True
+      merkle_root: True
+    file_manifests:
+      - path: "SAPD theft/"
+        label: "SAPD theft evidence set"
+        anchors: ["T25010706", "2023-1448879", "2023-1687368", "2025-1400245"]
+      - path: "Documentation/"
+        label: "Statutory references and SOPs"
+        anchors: ["TX Penal Code", "Property Code", "Insurance Code", "Occ. Code"]
+    cross_refs:
+      tabs: ["BankEntities", "NationalLetters", "ChildSupportLedger", "CourtAnchors", "IdentityVerification"]
+    audit:
+      hash: True
+      timestamp: True
+      vault_pointer: "vault://gh/Hoa-plus-homeowners-12-30-years.snapshot"
